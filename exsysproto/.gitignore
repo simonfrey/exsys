@@ -1,0 +1,7 @@
+.serverless
+.build
+.vscode
+node_modules
+*.zip
+*.js
+configureApiGateway.ts

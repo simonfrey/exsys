@@ -1,0 +1,10 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+.localstack
+.vscode
+bower_components
+s3WebsiteBucketPolicy.json

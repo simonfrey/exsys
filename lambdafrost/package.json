@@ -1,0 +1,29 @@
+{
+    "name": "bifrost-compose-sample",
+    "version": "0.0.1",
+    "dependencies": {
+        "aws-sdk": "^2.643.0",
+        "bcrypt": "^4.0.1",
+        "bcryptjs": "^2.4.3",
+        "body-parser": "^1.15.0",
+        "compression": "^1.6.1",
+        "crypto": "^1.0.1",
+        "dotenv": "^2.0.0",
+        "errorhandler": "^1.4.3",
+        "jsonwebtoken": "^5.7.0",
+        "mongodb": "^3.5.5",
+        "mongoose": "^5.9.4",
+        "morgan": "^1.7.0",
+        "prom-client": "^3.0.2",
+        "util": "^0.12.3",
+        "uuid": "^7.0.2",
+        "zlib": "^1.0.5"
+    },
+    "devDependencies": {
+        "serverless-deployment-bucket": "^1.1.1",
+        "serverless-localstack": "^0.4.24",
+        "serverless-offline": "^6.4.0",
+        "serverless-plugin-typescript": "^1.1.9",
+        "typescript": "^3.8.3"
+    }
+}

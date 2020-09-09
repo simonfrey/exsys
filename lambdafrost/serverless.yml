@@ -1,0 +1,149 @@
+service: bifr
+plugins:
+  - serverless-offline
+provider:
+  name: aws
+  runtime: nodejs10.x
+  memorySize: 1024
+  timeout: 30
+
+  region: us-east-1
+  environment:
+    JSONWEBTOKEN: "testtonek"
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:PutItem
+        - dynamodb:BatchWriteItem
+        - dynamodb:Scan
+        - dynamodb:Query
+
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/*"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/customers/index/*"
+functions:
+  #
+  # auth
+  login:
+    handler: handler/auth.login
+    events:
+      - http:
+          path: customers/login
+          method: get
+          cors: true
+  p_index:
+    handler: handler/products.index
+    events:
+      - http:
+          path: products/
+          method: get
+          cors: true
+  p_getProduct:
+    handler: handler/products.getProduct
+    events:
+      - http:
+          path: products/{id}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+  p_buyProduct:
+    handler: handler/products.buyProduct
+    events:
+      - http:
+          path: products/{id}/buy
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+  p_buyersProduct:
+    handler: handler/products.buyersProduct
+    events:
+      - http:
+          path: products/{id}/buyers
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+
+  s_search:
+    handler: handler/search.index
+    events:
+      - http:
+          path: search
+          method: get
+          cors: true
+
+  p_search:
+    handler: handler/search.index
+    events:
+      - http:
+          path: products/search
+          method: get
+          cors: true
+
+  seed:
+    handler: handler/seed.index
+    events:
+      - http:
+          path: seed
+          method: put
+          cors: true
+resources:
+  Resources:
+    customers:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: customers
+        AttributeDefinitions:
+          - AttributeName: "id"
+            AttributeType: S
+          - AttributeName: "email"
+            AttributeType: S
+        KeySchema:
+          - AttributeName: "id"
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        GlobalSecondaryIndexes:
+          - IndexName: "email_index"
+            KeySchema:
+              - AttributeName: "email"
+                KeyType: "HASH"
+            Projection:
+              ProjectionType: "ALL"
+    products:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: products
+        AttributeDefinitions:
+          - AttributeName: "id"
+            AttributeType: S
+        KeySchema:
+          - AttributeName: "id"
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    transactions:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: transactions
+        AttributeDefinitions:
+          - AttributeName: "id"
+            AttributeType: S
+          - AttributeName: "product"
+            AttributeType: S
+        KeySchema:
+          - AttributeName: product
+            KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST

@@ -1,0 +1,456 @@
+{
+    "apiGateway": {
+        "arns": {
+            "original": "[TODO]",
+            "experiment": "[SAME as original]"
+        },
+        "endpoint": {
+            "httpMethod": "GET",
+            "resourceId": "[TODO]"
+        },
+        "region": "us-east-1",
+        "restApiId": "[TODO]",
+        "stage": "dev"
+    },
+    "cacheCount":8,
+    "stages": [
+        {
+            "time_s": 20,
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 60,
+            "shadow": {
+                "totalRequestsPerSecond": 60
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 60
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 61
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 62
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 63
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 64
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 65
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 66
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 67
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 68
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 69
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 70
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 71
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 72
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 73
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 74
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 75
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 76
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 77
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 78
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 79
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 80
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 81
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 82
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 83
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 84
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 85
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 86
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 87
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 88
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 89
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 90
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 91
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 92
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 93
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 94
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 95
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 96
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 97
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 98
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 99
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 100
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 101
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 102
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 103
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 104
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 105
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 106
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 107
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 108
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 109
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 110
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 111
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 112
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 113
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 114
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 115
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 116
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 117
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 118
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 1,
+            "shadow": {
+                "totalRequestsPerSecond": 119
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 180,
+            "shadow": {
+                "totalRequestsPerSecond": 75
+            },
+            "saveResponseBody": false
+        }
+    ]
+}

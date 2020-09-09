@@ -1,0 +1,125 @@
+service: exsys
+#app: bifrostlambda
+org: simonfrey
+plugins:
+  - serverless-offline
+  - serverless-plugin-typescript
+
+provider:
+  name: aws
+  
+  runtime: nodejs10.x
+  memorySize: 1024
+  timeout: 30
+  
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:GetRecords
+        - dynamodb:GetShardIterator
+        - dynamodb:DescribeStream
+        - dynamodb:Scan
+        - dynamodb:Query
+        - dynamodb:ListStreams
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/*"
+    - Effect: Allow
+      Action:
+        - lambda:InvokeAsync
+        - lambda:InvokeFunction
+        - lambda:CreateAlias
+        - lambda:GetAlias
+        - lambda:DeleteAlias
+        - lambda:AddPermission
+      Resource:  "arn:aws:lambda:*:*:function:*"
+    - Effect: Allow
+      Action:
+        - apigateway:GET
+        - apigateway:POST
+        - apigateway:PATCH
+        - apigateway:PUT
+      Resource: "arn:aws:apigateway:us-east-1::*"
+functions:
+  increaseRequestCount:
+    handler: ./dynamoTrigger/ExSysResults_increaseRequestCount.handler
+    events:
+      - stream:
+          type: dynamodb
+          batchSize: 10
+          arn:
+            Fn::GetAtt: [ExSysResults, StreamArn]
+  proxy:
+    handler: ./proxy/proxy.handler
+  newExperiment:
+    handler: handler/putExperiment.handler
+    events:
+      - http:
+          path: /experiments
+          method: PUT
+          cors: true  
+  getExampleConfig:
+    handler: handler/putExperiment.getExampleConfig
+    events:
+      - http:
+          path: /example
+          method: GET
+          cors: true  
+  getExperiment:
+    handler: handler/getExperiment.handler
+    events:
+      - http:
+          path: /experiments/{id}
+          method: get
+          cors: true
+  stopExperiment:
+    handler: handler/startStopExperiment.stopHandler
+    events:
+      - http:
+          path: /experiments/{id}/stop
+          method: POST
+          cors: true
+  startExperiment:
+    handler: handler/startStopExperiment.startHandler
+    events:
+      - http:
+          path: /experiments/{id}/start
+          method: POST
+          cors: true
+resources:
+    Resources:
+      ExSysResults: 
+        Type: AWS::DynamoDB::Table
+        Properties:
+          TableName: ExSysResults
+          AttributeDefinitions:
+            - AttributeName: id
+              AttributeType: S
+            - AttributeName: experimentID
+              AttributeType: S
+          KeySchema:
+            - AttributeName: id
+              KeyType: HASH
+          BillingMode: PAY_PER_REQUEST
+          StreamSpecification:
+            StreamViewType: NEW_IMAGE
+          GlobalSecondaryIndexes:
+            - IndexName: "experimentID_index"
+              KeySchema:
+                - AttributeName: "experimentID"
+                  KeyType: "HASH"
+              Projection:
+                ProjectionType: "ALL"
+      ExSysConfig: 
+        Type: AWS::DynamoDB::Table
+        Properties:
+          TableName: ExSysConfig
+          AttributeDefinitions:
+            - AttributeName: id
+              AttributeType: S
+          KeySchema:
+            - AttributeName: id
+              KeyType: HASH
+          BillingMode: PAY_PER_REQUEST

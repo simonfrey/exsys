@@ -1,0 +1,183 @@
+{
+    "apiGateway": {
+        "arns": {
+            "original": "[TODO]",
+            "experiment": "[SAME as original]"
+        },
+        "endpoint": {
+            "httpMethod": "GET",
+            "resourceId": "[TODO]"
+        },
+        "region": "us-east-1",
+        "restApiId": "[TODO]",
+        "stage": "dev"
+    },
+    "cacheCount":8,
+    "stages": [
+        {
+            "time_s": 20,
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 60,
+            "canary":{
+                "percent":5
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 60,
+            "shadow": {
+                "multiplier": 1
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 60,
+            "canary":{
+                "percent":50
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":5
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":10
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":15
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":20
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":25
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":30
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":35
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":40
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":45
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":50
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":55
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":60
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":65
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":70
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":75
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":80
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":85
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":90
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":95
+            },
+            "saveResponseBody": false
+        },
+        {
+            "time_s": 10,
+            "canary":{
+                "percent":100
+            },
+            "saveResponseBody": false
+        }
+    ]
+}

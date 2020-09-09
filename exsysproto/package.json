@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "@mojotech/json-type-validation": "^3.1.0",
+    "@types/node": "^13.11.0",
+    "aws-sdk": "^2.655.0",
+    "fs": "^0.0.1-security",
+    "jszip": "^3.3.0",
+    "promise": "^8.1.0",
+    "stream-to-buffer": "^0.1.0",
+    "uuid": "^7.0.3",
+    "zlib": "^1.0.5"
+  },
+  "devDependencies": {
+    "serverless-offline": "^6.4.0",
+    "serverless-plugin-typescript": "^1.1.9",
+    "typescript": "^3.8.3"
+  }
+}
