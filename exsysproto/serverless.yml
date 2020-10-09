@@ -34,6 +34,10 @@ provider:
         - lambda:GetAlias
         - lambda:DeleteAlias
         - lambda:AddPermission
+        - lambda:ListVersionsByFunction
+        - lambda:PutProvisionedConcurrencyConfig
+        - lambda:DeleteProvisionedConcurrencyConfig
+        - lambda:GetProvisionedConcurrencyConfig
       Resource:  "arn:aws:lambda:*:*:function:*"
     - Effect: Allow
       Action:

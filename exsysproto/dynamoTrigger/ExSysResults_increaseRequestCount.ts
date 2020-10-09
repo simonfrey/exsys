@@ -1,7 +1,7 @@
 import AWS = require("aws-sdk");
 
 import { put as putcfg, get as getcfg } from "../dynamo/experiments";
-import { getApiGatewayARN,getCurrentStage } from "../types/config";
+import { getApiGatewayARN, getCurrentStage } from "../types/config";
 import { removeProxy } from "../apiGateway/proxy";
 import { increase } from "../dynamo/requestCounts";
 
@@ -92,7 +92,7 @@ async function updateExperimentStatus(
 
   // Check if experiment already set to started
   if (cfg.startTime == 0) {
-    // Experiment just started
+     // Experiment just started
     cfg.startTime = now;
     cfg.active = true;
     cfg.stages[0].startTime = now;
@@ -105,13 +105,13 @@ async function updateExperimentStatus(
     // Experiment is over
 
     // check if already removed
-    if (!cfg.active && cfg.endTime != undefined && cfg.endTime > 0){
+    if (!cfg.active && cfg.endTime != undefined && cfg.endTime > 0) {
       return;
     }
 
     cfg.active = false;
     cfg.endTime = now;
-    cfg.stages[cfg.stages.length-1].endTime = now;
+    cfg.stages[cfg.stages.length - 1].endTime = now;
     await putcfg(dynClient, cfg);
 
     // Remove the proxy
@@ -152,5 +152,5 @@ async function updateExperimentStatus(
   // Set start time of current stage
   cfg.stages[csn].startTime = now;
   await putcfg(dynClient, cfg);
-    return;
+  return;
 }

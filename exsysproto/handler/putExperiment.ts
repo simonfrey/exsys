@@ -35,6 +35,7 @@ module.exports.handler = async event => {
             reqCount:0,
             apiGateway: body.apiGateway,
             stages: body.stages,
+            preProvision:body.preProvision
         }
     
 
@@ -54,6 +55,7 @@ module.exports.handler = async event => {
         // Apparently ARN is fine. So deploy the proxy
         const newCFG:Config = await injectProxy(apigateway, lambdaClient, cfg)
         console.log("PROXY DEPLOYED")
+
         
         // Save the config into the db
         const res = await putExperimentConfig(dynClient, newCFG)
@@ -71,6 +73,7 @@ module.exports.getExampleConfig = async event => {
         apiGateway:apiGateway;
         stages:Stage[];
         cacheCount: number;
+        preProvision:number;        
     } = {
         apiGateway:{
             arns:{
@@ -85,6 +88,7 @@ module.exports.getExampleConfig = async event => {
             restApiId:"",
             stage:""
         },
+        preProvision:200,
         stages:[
             {
                 time_s:600,

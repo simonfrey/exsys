@@ -4,6 +4,7 @@ import { httpResponse, httpError } from "../components/response";
 import { setActive, get as getExperimentConfig } from "../dynamo/experiments";
 import { removeProxy } from "../apiGateway/proxy";
 import { put as putcfg } from "../dynamo/experiments";
+import { isProvisionedConcurrencyReady } from "../lambda/provisioned_concurrency";
 
 const region = "us-east-1";
 
@@ -80,6 +81,20 @@ async function activateExperiment(cfg: Config): Promise<Config> {
       cfg.apiGateway.arns.proxy!
     )}". Maybe this experiment is not yet put?`;
   }
+
+     // If experiment has provisioned concurrency, check if it is ready
+     if (cfg.preProvision != undefined) {
+      const aliasName = cfg.apiGateway.region + "_" + cfg.id;
+      const functionName = "exsys-dev-proxy";
+      const experimentFunctionName = cfg.apiGateway.arns.experiment
+        .split(":")
+        .pop();
+      if (
+        !(await isProvisionedConcurrencyReady(lambdaClient, functionName, aliasName)) ||
+        !(await isProvisionedConcurrencyReady(lambdaClient,experimentFunctionName!,aliasName))) {
+        throw "Your configured provisioned concurrency is not ready yet. Experiment can not yet be started. Please try again in a few seconds.";
+      }
+    }
 
   if (cfg.active) {
     // Experiment is already activated

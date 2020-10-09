@@ -1,5 +1,9 @@
 import AWS = require("aws-sdk");
 import { Config, getApiGatewayARN } from "../types/config";
+import {
+  setProvisionedConcurrency,
+  deleteProvisionedConcurrency,
+} from "../lambda/provisioned_concurrency";
 
 export const injectProxy = async function (
   apiGateway: AWS.APIGateway,
@@ -36,10 +40,16 @@ export const injectProxy = async function (
   console.log("Integration: ", int);
 
   // 2. CREATE ALIAS
-  var aliasName = cfg.apiGateway.region + "_" + cfg.id;
+  const aliasName = cfg.apiGateway.region + "_" + cfg.id;
+  const functioName = "exsys-dev-proxy";
+
+  const experimentFunctionName = cfg.apiGateway.arns.experiment
+    .split(":")
+    .pop();
+
   try {
     var aliasParams = {
-      FunctionName: "exsys-dev-proxy",
+      FunctionName: functioName,
       Name: aliasName,
     };
 
@@ -47,9 +57,18 @@ export const injectProxy = async function (
       // Check if alias exists
       var res = await lambdaClient.getAlias(aliasParams).promise();
     } catch (err) {
+      //
+      var vRes = await lambdaClient
+        .listVersionsByFunction({
+          FunctionName: functioName,
+        })
+        .promise();
+      var latestVersion: string =
+        vRes.Versions![vRes.Versions!.length - 1].Version! || "$LATEST";
+
       // Create new alias
       var res = await lambdaClient
-        .createAlias({ ...aliasParams, FunctionVersion: "$LATEST" })
+        .createAlias({ ...aliasParams, FunctionVersion: latestVersion })
         .promise();
     }
     console.log(res);
@@ -113,6 +132,56 @@ export const injectProxy = async function (
       .promise();
   } catch (err) {
     throw "Could not update integration request : " + err;
+  }
+
+  // If preProvision set the value for the proxy alias and the original function
+  if (cfg.preProvision != undefined && cfg.preProvision > 0) {
+    try {
+      var vRes = await lambdaClient
+        .listVersionsByFunction({
+          FunctionName: experimentFunctionName!,
+        })
+        .promise();
+      var latestVersion: string =
+        vRes.Versions![vRes.Versions!.length - 1].Version! || "$LATEST";
+
+      // Create new alias
+      var res = await lambdaClient
+        .createAlias({
+          FunctionName: experimentFunctionName!,
+          Name: aliasName,
+          FunctionVersion: latestVersion,
+        })
+        .promise();
+    } catch (err) {
+      throw "Could not create alias for experiment function";
+    }
+
+    try {
+      await setProvisionedConcurrency(
+        lambdaClient,
+        experimentFunctionName!,
+        aliasName,
+        cfg.preProvision
+      );
+      await setProvisionedConcurrency(
+        lambdaClient,
+        functioName,
+        aliasName,
+        cfg.preProvision
+      );
+    } catch (err) {
+      throw (
+        "Could not set provisioned concurrency '" +
+        cfg.preProvision +
+        "' for '" +
+        functioName +
+        ":" +
+        aliasName +
+        "': " +
+        err
+      );
+    }
   }
 
   // Deploy stage
@@ -195,16 +264,47 @@ export const removeProxy = async function (
     throw "Could not deploy stage '" + cfg.apiGateway.stage + "': " + err;
   }
 
+  const functionName = "exsys-dev-proxy";
+  const aliasName = cfg.apiGateway.region + "_" + cfg.id;
+  const experimentFunctionName = cfg.apiGateway.arns.experiment
+    .split(":")
+    .pop();
+
+  // Remove provisioned concurrency
+  if (cfg.preProvision != undefined) {
+    try {
+      await deleteProvisionedConcurrency(lambdaClient, experimentFunctionName!, aliasName);
+      await deleteProvisionedConcurrency(lambdaClient, functionName, aliasName);
+
+
+    await lambdaClient
+    .deleteAlias({
+      FunctionName: experimentFunctionName!,
+      Name: aliasName,
+    })
+    .promise();
+    } catch (err) {
+      throw (
+        "Could not delete provisioned concurrency '" +
+        cfg.preProvision +
+        "' for '" +
+        functionName +
+        ":" +
+        aliasName +
+        "': " +
+        err
+      );
+    }
+  }
+
   // 3. Delete ALIAS
   try {
-    var aliasParams = {
-      FunctionName: "exsys-dev-proxy",
-      Name: cfg.apiGateway.region + "_" + cfg.id,
-    };
-
-    var res = await lambdaClient.deleteAlias(aliasParams).promise();
-
-    console.log(res);
+    await lambdaClient
+      .deleteAlias({
+        FunctionName: functionName,
+        Name: aliasName,
+      })
+      .promise();
   } catch (err) {
     throw "Could not delete alias : " + err;
   }

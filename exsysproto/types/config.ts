@@ -5,6 +5,7 @@ export interface Config {
     readonly id: string;
 
     readonly apiGateway: apiGateway;
+    readonly preProvision?: number;
 
     stages: Stage[];
 
@@ -36,7 +37,7 @@ export interface apiGateway{
     readonly restApiId: string;
     readonly arns:{
         readonly original:string;
-        readonly experiment:string;
+        experiment:string;
         proxy?:string;
     };
     readonly endpoint:{
