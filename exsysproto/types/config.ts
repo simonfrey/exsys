@@ -11,7 +11,6 @@ export interface Config {
     startTime: number;
     endTime: number;
     active: boolean;
-    currentStage: number;
     reqCount: number;
 }
 
@@ -83,3 +82,37 @@ export const getApiGatewayARN = function(arn:string):string{
     return "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/"+arn+"/invocations"   
 }
 
+
+
+
+export const getCurrentStage = function(cfg: Config, now: number): {stageNumber: number,stage:Stage|undefined} {
+    var currentStage: Stage | undefined = undefined;
+    var currentStageNumber: number = -1;
+    var stageStart = cfg.startTime;
+    if (!cfg.active) {
+      // Experiment not active
+            return {stageNumber:-1,stage:undefined};
+    }
+    if (stageStart == 0) {
+        // experiment just started
+        return {stageNumber:0,stage:cfg.stages[0]};
+    }
+  
+    cfg.stages.every((stage,key) => {
+      var stageEnd = stageStart + stage.time_s * 1000;
+  
+      if (now >= stageStart && now < stageEnd ) {
+        currentStage = stage;
+        currentStageNumber = key;
+        // break
+        return false;
+      }
+      stageStart = stageEnd;
+  
+      // continue
+      return true;
+    });
+  
+    return {stageNumber:currentStageNumber,stage:currentStage};
+  }
+  

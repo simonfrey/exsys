@@ -1,7 +1,7 @@
 import AWS = require("aws-sdk");
 
 import { put as putcfg, get as getcfg } from "../dynamo/experiments";
-import { getApiGatewayARN } from "../types/config";
+import { getApiGatewayARN,getCurrentStage } from "../types/config";
 import { removeProxy } from "../apiGateway/proxy";
 import { increase } from "../dynamo/requestCounts";
 
@@ -90,74 +90,67 @@ async function updateExperimentStatus(
     return;
   }
 
-  var currentStage = cfg.stages[cfg.currentStage];
-
   // Check if experiment already set to started
   if (cfg.startTime == 0) {
     // Experiment just started
     cfg.startTime = now;
     cfg.active = true;
-    cfg.stages[cfg.currentStage].startTime = now;
+    cfg.stages[0].startTime = now;
     await putcfg(dynClient, cfg);
-
     return;
   }
 
-  console.log(
-    "Next stage?",
-    currentStage.startTime! + currentStage.time_s * 1000 < now,
-    currentStage.startTime!,
-    currentStage.time_s * 1000,
-    now
-  );
+  const csn = getCurrentStage(cfg, now).stageNumber;
+  if (csn == -1) {
+    // Experiment is over
 
-  // Check if we are still in the same stage
-  if (currentStage.startTime! + currentStage.time_s * 1000 > now) {
-    // Same stage, nothing to do
-    console.log("Same stage");
-    return;
-  }
+    // check if already removed
+    if (!cfg.active && cfg.endTime != undefined && cfg.endTime > 0){
+      return;
+    }
 
-  cfg.stages[cfg.currentStage].endTime = now;
-
-  if (cfg.currentStage + 1 >= cfg.stages.length) {
-    // Stage count smaller than currentStage. Experiment is over
-    console.log("Set Experiment '" + experimentID + "' to inactive");
     cfg.active = false;
     cfg.endTime = now;
-  } else {
-    // Transition to next stage
-    cfg.currentStage++;
-    console.log("Set Experiment '" + experimentID + "' to next stage");
-    cfg.stages[cfg.currentStage].startTime = now;
-  }
-  putcfg(dynClient, cfg);
+    cfg.stages[cfg.stages.length-1].endTime = now;
+    await putcfg(dynClient, cfg);
 
-  // Check if we should remove the proxy
-  if (cfg.active) {
+    // Remove the proxy
+    console.log("Try to remove proxy");
+
+    if (cfg.apiGateway.arns.proxy == undefined) {
+      throw "Proxy ARN is undefined";
+    }
+
+    var int: AWS.APIGateway.Integration = await apigateway
+      .getIntegration({
+        restApiId: cfg.apiGateway.restApiId,
+        httpMethod: cfg.apiGateway.endpoint.httpMethod,
+        resourceId: cfg.apiGateway.endpoint.resourceId,
+      })
+      .promise();
+
+    const proxyARN = getApiGatewayARN(cfg.apiGateway.arns.proxy!);
+    if (int.uri != proxyARN) {
+      throw `Current integration "${int.uri}" is not expected proxy ARN "${proxyARN}"`;
+    }
+
+    const newCFG = await removeProxy(apigateway, lambdaClient, cfg);
+    await putcfg(dynClient, newCFG);
     return;
   }
 
-  // Remove the proxy
-  console.log("Try to remove proxy");
-
-  if (cfg.apiGateway.arns.proxy == undefined) {
-    throw "Proxy ARN is undefined";
+  if (cfg.stages[csn].startTime != undefined) {
+    // we are in the same stage
+    return;
   }
 
-  var int: AWS.APIGateway.Integration = await apigateway
-    .getIntegration({
-      restApiId: cfg.apiGateway.restApiId,
-      httpMethod: cfg.apiGateway.endpoint.httpMethod,
-      resourceId: cfg.apiGateway.endpoint.resourceId,
-    })
-    .promise();
-
-  const proxyARN = getApiGatewayARN(cfg.apiGateway.arns.proxy!);
-  if (int.uri != proxyARN) {
-    throw `Current integration "${int.uri}" is not expected proxy ARN "${proxyARN}"`;
+  // We are in a new stage
+  // set end of last stage
+  if (cfg.stages[csn - 1].endTime == undefined) {
+    cfg.stages[csn - 1].endTime = now;
   }
-
-  const newCFG = await removeProxy(apigateway, lambdaClient, cfg);
-  await putcfg(dynClient, newCFG);
+  // Set start time of current stage
+  cfg.stages[csn].startTime = now;
+  await putcfg(dynClient, cfg);
+    return;
 }

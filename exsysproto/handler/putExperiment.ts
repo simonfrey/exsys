@@ -32,7 +32,6 @@ module.exports.handler = async event => {
             startTime: 0,
             endTime: 0,
             active: false,
-            currentStage: 0,
             reqCount:0,
             apiGateway: body.apiGateway,
             stages: body.stages,

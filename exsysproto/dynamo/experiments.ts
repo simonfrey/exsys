@@ -1,7 +1,6 @@
 import { Config } from "../types/config"
 
 const tableName = "ExSysConfig"
-const cacheTimeS =1;
 
 var cfgCache: {
     [id: string]: {
@@ -30,7 +29,6 @@ export async function get(
     dynClient: AWS.DynamoDB.DocumentClient,
     experimentID: string,
     noCache: boolean = false): Promise<Config> {
-    if (noCache || cfgCache[experimentID] == undefined || (new Date().getTime())- cfgCache[experimentID]!.lastUpdate.getTime() > cacheTimeS * 1000) {
         // Load config from DB
         var res = await dynClient.query({
             TableName: tableName,
@@ -42,10 +40,7 @@ export async function get(
                 ":getID": experimentID
             }
         }).promise();
-        cfgCache[experimentID] = {cfg:res.Items![0] as Config,lastUpdate:new Date()};
-    }
-    
-    return cfgCache[experimentID].cfg
+        return res.Items![0] as Config;
 }
 
 

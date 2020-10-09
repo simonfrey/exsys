@@ -3,6 +3,7 @@ import { Result, Experiment } from "../types/experiment";
 import { httpResponse,gzipedHttpResponse, httpError } from "../components/response";
 import { get as getExperimentConfig } from "../dynamo/experiments";
 import { get as getExperimentResults } from "../dynamo/results";
+import { getCurrentStage } from "../types/config";
 
 const region = "us-east-1";
 
@@ -19,6 +20,7 @@ module.exports.handler = async (event) => {
       return await httpResponse(404);
     }
 
+    const now = new Date().getTime();
     var withBody = false;
     if (
       event.queryStringParameters != undefined &&
@@ -59,6 +61,9 @@ module.exports.handler = async (event) => {
     });
 
 
+      // Check if experiment is already over
+      const currStageNumber =  getCurrentStage(cfg,now).stageNumber
+
     resultsByStages.forEach((res) => {
       res.res.sort(function (a: Result, b: Result) {
         return a.startTime - b.startTime;
@@ -66,11 +71,8 @@ module.exports.handler = async (event) => {
 
       cfg.stages[res.stage].startTime = res.res[0].startTime;
 
-      // Check if stage is already over
       if (
-        !cfg.active ||
-        cfg.currentStage > res.stage ||
-        (cfg.currentStage == res.stage && res.stage == cfg.stages.length - 1)
+        cfg.startTime != 0 && currStageNumber  ==-1
       ) {
         cfg.stages[res.stage].endTime =
           res.res[res.res.length - 1].startTime +
@@ -82,11 +84,11 @@ module.exports.handler = async (event) => {
 
     // Check if experiment is already over
     if (!cfg.active) {
-      var last = cfg.currentStage;
-      if (last >= cfg.stages.length){
+      var last = currStageNumber;
+      if (last ==-1 || last >= cfg.stages.length){
         last = cfg.stages.length -1;
       }
-      cfg.endTime = cfg.stages[cfg.currentStage].endTime!;
+      cfg.endTime = cfg.stages[last].endTime!;
     }
 
 

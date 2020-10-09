@@ -83,15 +83,6 @@ export const injectProxy = async function (
       resource.path;
     console.log("SOURCE ARN: ", pSArn);
 
-    // try{
-    //     await lambdaClient.removePermission({
-    //         FunctionName: "exsys-dev-proxy:" + aliasName,
-    //         StatementId: "exSysExperiment_" + cfg.id
-    //     }).promise();
-    // }catch(err){
-    //     console.log("Could not remove permission: ",err)
-    // }
-
     var pemRes = await lambdaClient
       .addPermission({
         Action: "lambda:InvokeFunction",
