@@ -28,7 +28,7 @@
         {
             "time_s": 60,
             "shadow": {
-                "multiplier": 1
+                "multiplier": 2
             },
             "saveResponseBody": false
         },
