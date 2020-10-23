@@ -120,7 +120,6 @@ function processExSysData(timeDiv, startTS, endTS, data) {
                 }
             }
 
-
             respObj[item.strategy][ts] += 1
         })
     })
@@ -131,7 +130,7 @@ function processExSysData(timeDiv, startTS, endTS, data) {
         if (item.stage < 1) {
             return
         }
-        if (item.stage > data.config.currentStage) {
+        if (item.stage > data.config.stages.length) {
             return
         }
 
@@ -149,7 +148,7 @@ function processExSysData(timeDiv, startTS, endTS, data) {
             var res = base;
 
             if (stageCFG.shadow != undefined && stageCFG.shadow.multiplier != undefined) {
-                res = base * (stageCFG.shadow.multiplier + 1);
+                res = base * stageCFG.shadow.multiplier;
             }
 
 
@@ -441,7 +440,7 @@ function processExSysDataTotalRequest(timeDiv, startTS, endTS, data) {
         } else {
             var res = base[index];
             if (stageCFG.shadow != undefined && stageCFG.shadow.multiplier != undefined) {
-                res = base[index] * (stageCFG.shadow.multiplier + 1);
+                res = base[index] * stageCFG.shadow.multiplier;
             }
             // TODO: base is weird wrong
             respObj["expected total"][index] = res;
