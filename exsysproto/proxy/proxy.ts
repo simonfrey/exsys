@@ -1,7 +1,7 @@
 import AWS = require("aws-sdk");
 import crypto = require("crypto");
 
-import { Config, Stage,getCurrentStage } from "../types/config";
+import { Config, Stage, getCurrentStage } from "../types/config";
 import { get as getExperimentConfig } from "../dynamo/experiments";
 import { get as getRequestCount } from "../dynamo/requestCounts";
 import { invokeLambda } from "./invokeLambda";
@@ -48,10 +48,21 @@ module.exports.handler = async (event, context) => {
   const stageNumber = stageRes.stageNumber;
 
 
-  console.log("STAGENUM: ",stageNumber)
+
+  var orignARN = config.apiGateway.arns.original;
+  var experimentARN = config.apiGateway.arns.experiment;
+  if (config.preProvision != undefined) {
+    const aliasName = config.apiGateway.region + "_" + config.id;
+    orignARN =  config.apiGateway.arns.original + ":" + aliasName;
+    experimentARN =  config.apiGateway.arns.experiment + ":" + aliasName;
+  }
+
+
+  console.log("STAGENUM: ", stageNumber);
 
   var clientResult: any = null;
 
+  // Check if to run canary traffic
   if (
     stage == undefined || // Experiment is not yet started or over
     stage!.canary == undefined || // only original traffic is configured
@@ -60,13 +71,15 @@ module.exports.handler = async (event, context) => {
     // Run original function and return result
     console.log("Invoke base");
     var saveResponseBody = false;
-    if (stage != undefined){
-      saveResponseBody = stage!.saveResponseBody == true
+    if (stage != undefined) {
+      saveResponseBody = stage!.saveResponseBody == true;
     }
+
+
     clientResult = await invokeLambda(
       dynClient!,
       lambdaClient!,
-      config.apiGateway.arns.original,
+      orignARN,
       vm_id,
       stageNumber,
       config.id,
@@ -90,7 +103,7 @@ module.exports.handler = async (event, context) => {
     clientResult = await invokeLambda(
       dynClient!,
       lambdaClient!,
-      config.apiGateway.arns.experiment,
+      experimentARN,
       vm_id,
       stageNumber,
       config.id,
@@ -136,12 +149,17 @@ module.exports.handler = async (event, context) => {
           throw "reqCount is smaller than one";
         }
 
-        const secondsDone = (now - config.startTime) / 1000;
-        const reqsPerSecond = reqCount / secondsDone;
+        const secondsDone =  parseInt(((now-config.startTime) / 1000).toFixed());
+        const reqsPerSecond = reqCount / sSum(secondsDone);
 
-        multiplier =
-          Math.round(stage.shadow!.totalRequestsPerSecond / reqsPerSecond) - 1;
+        const exactMultiplier = stage.shadow!.totalRequestsPerSecond / reqsPerSecond;
+        multiplier = parseInt(exactMultiplier.toFixed()); // Remove decimals and remove the base traffic call
+        if ((exactMultiplier - multiplier)*100 > r){
+          // By random we add another request as of the decimals
+          multiplier++
+        }
 
+      
         console.log(
           "Shadow multiplier",
           multiplier,
@@ -163,12 +181,13 @@ module.exports.handler = async (event, context) => {
       }
 
       // Invoke shadow functions
-      for (var i = 0; i < multiplier - 1; i++) {
+      // Subtract one as we do not want to additionally also add for the base traffic
+      for (var i = 0; i < multiplier-1; i++) {
         console.log("Invoke shadow " + i);
         invokeLambda(
           dynClient!,
           lambdaClient!,
-          config!.apiGateway.arns.experiment,
+          experimentARN,
           vm_id,
           stageNumber,
           config!.id,
@@ -186,3 +205,14 @@ module.exports.handler = async (event, context) => {
 
   return clientResult;
 };
+
+
+
+
+function sSum(num)
+{
+    var rval=1;
+    for (var i = 2; i <= num; i++)
+        rval = rval + i;
+    return rval;
+}

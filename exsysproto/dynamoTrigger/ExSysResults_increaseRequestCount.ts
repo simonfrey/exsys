@@ -1,7 +1,7 @@
 import AWS = require("aws-sdk");
 
 import { put as putcfg, get as getcfg } from "../dynamo/experiments";
-import { getApiGatewayARN, getCurrentStage } from "../types/config";
+import { getApiGatewayARN, getCurrentStage, Config } from "../types/config";
 import { removeProxy } from "../apiGateway/proxy";
 import { increase } from "../dynamo/requestCounts";
 
@@ -59,18 +59,20 @@ module.exports.handler = async function (
   var ps: Promise<any>[] = [];
   Object.keys(counts).forEach(function (exId: string) {
     ps.push(
-      new Promise(function (resolve, reject) {
+      new Promise(async function (resolve, reject) {
         try {
-          updateExperimentStatus(dynClient, exId, now);
+          const cfg = await getcfg(dynClient, exId, true);
+          var currSec = parseInt(((now-cfg.startTime) / 1000).toFixed());
+          if (cfg.startTime == 0){
+            currSec = 1;
+          }
+
+          await updateExperimentStatus(dynClient, now, cfg);
+          await increase(dynClient, exId, counts[exId] * currSec);
+                    
+          resolve();
         } catch (err) {
-          console.log("Could not updateExperimentStatus: ", err);
-        }
-        try {
-          increase(dynClient, exId, counts[exId]).then(() => {
-            resolve();
-          });
-        } catch (err) {
-          console.log("Could not increase: ", err);
+          reject(err);
         }
       })
     );
@@ -81,18 +83,17 @@ module.exports.handler = async function (
 
 async function updateExperimentStatus(
   dynClient: AWS.DynamoDB.DocumentClient,
-  experimentID: string,
-  now: number
+  now: number,
+  cfg: Config
 ) {
-  var cfg = await getcfg(dynClient, experimentID, true);
   if (!cfg.active) {
-    console.log("Experiment '" + experimentID + "' is not active anymore");
+    console.log("Experiment '" + cfg.id + "' is not active anymore");
     return;
   }
 
   // Check if experiment already set to started
   if (cfg.startTime == 0) {
-     // Experiment just started
+    // Experiment just started
     cfg.startTime = now;
     cfg.active = true;
     cfg.stages[0].startTime = now;

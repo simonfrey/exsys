@@ -89,9 +89,13 @@ async function activateExperiment(cfg: Config): Promise<Config> {
       const experimentFunctionName = cfg.apiGateway.arns.experiment
         .split(":")
         .pop();
+      const orignalFunctionName = cfg.apiGateway.arns.original
+        .split(":")
+        .pop();
       if (
         !(await isProvisionedConcurrencyReady(lambdaClient, functionName, aliasName)) ||
-        !(await isProvisionedConcurrencyReady(lambdaClient,experimentFunctionName!,aliasName))) {
+        !(await isProvisionedConcurrencyReady(lambdaClient,experimentFunctionName!,aliasName)) ||
+        !(cfg.apiGateway.arns.experiment == cfg.apiGateway.arns.original || await isProvisionedConcurrencyReady(lambdaClient,orignalFunctionName!,aliasName))) {
         throw "Your configured provisioned concurrency is not ready yet. Experiment can not yet be started. Please try again in a few seconds.";
       }
     }
@@ -107,6 +111,7 @@ async function activateExperiment(cfg: Config): Promise<Config> {
 
   return cfg;
 }
+
 
 async function deactivateExperiment(cfg: Config) {
   if (cfg.apiGateway.arns.proxy == undefined) {
